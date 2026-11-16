@@ -119,10 +119,69 @@
 #game #topCards{min-height:59px}
 #lastPlayedBy{font-size:12px;font-weight:800;color:#f5d184;min-height:17px;text-shadow:0 2px 4px #000a;white-space:nowrap}
 @media(max-width:600px){#game .board{height:clamp(250px,40vh,310px);border-radius:55px}#game .table-center{inset:69px 29% 62px}#lastPlayedBy{font-size:10px}}
+
+/* V7 — tavolinë më katrore, teksti i hedhjes i dukshëm, kontrollet anash dorës */
+#game .board{
+  width:min(100%,710px);height:360px;min-height:0;margin:9px auto 10px;
+  border-radius:34px;overflow:hidden;
+}
+#game .board:before{border-radius:26px}
+#game .table-seats .player{width:145px;min-height:56px}
+#game .table-seats .player.seat-top{top:8px}
+#game .table-seats .player.seat-bottom{bottom:8px}
+#game .table-seats .player.seat-left{left:8px}
+#game .table-seats .player.seat-right{right:8px}
+#game .table-center{
+  inset:102px 25% 77px;gap:5px;z-index:5;justify-content:center;
+}
+#lastPlayedBy{
+  display:block;position:relative;z-index:8;min-height:22px;
+  font-size:14px;font-weight:900;white-space:normal;line-height:1.2;
+  color:#ffe3a0;text-shadow:0 2px 5px #001c12,0 0 12px #000;
+}
+#game #topCards{min-height:67px}
+#game #combo,#game #pile{color:#fff1c9;text-shadow:0 2px 4px #001b12;font-weight:700}
+#game .hand-controls{
+  display:grid;grid-template-columns:74px minmax(0,1fr) 74px;
+  align-items:center;gap:8px;width:100%;margin:0 auto;
+}
+#game .hand-controls #hand{
+  width:100%;max-width:none;margin:7px 0 2px;
+  height:106px;min-height:106px;
+}
+#game .round-action{
+  width:72px;height:72px;border-radius:50%;padding:0;
+  display:grid;place-items:center;align-self:center;
+  background:linear-gradient(150deg,#f8d992,#c69a46);
+  color:#183427;border:2px solid #ffe8a6;
+  box-shadow:0 5px 13px #0008,inset 0 2px 4px #fff7;
+  font-weight:900;font-size:13px;letter-spacing:.4px;
+}
+#game .round-action.pass-round{
+  background:linear-gradient(150deg,#3d6b57,#234535);
+  color:#fff2d5;border-color:#c5a66b;
+}
+#game .round-action:disabled{opacity:.42;box-shadow:none}
+#game .secondary-actions{justify-content:center;margin:0 0 5px}
+@media(max-width:600px){
+ #game .board{width:100%;height:340px;border-radius:26px}
+ #game .board:before{border-radius:20px}
+ #game .table-seats .player{width:95px}
+ #game .table-center{inset:100px 29% 72px;gap:3px}
+ #lastPlayedBy{font-size:11px;min-height:18px}
+ #game .hand-controls{grid-template-columns:53px minmax(0,1fr) 53px;gap:3px}
+ #game .round-action{width:51px;height:51px;font-size:10px}
+ #game .hand-controls #hand{height:104px;min-height:104px}
+}
+@media(max-height:760px) and (min-width:601px){
+ #game .board{height:320px}
+ #game .table-center{inset:90px 25% 65px}
+ #game .hand-controls #hand{height:96px;min-height:96px}
+}
 </style></head><body><div class="shell"><header><div><div class="brand">GAME HUB <span class="small muted">· beta</span></div><div class="small muted">Murlan · loja e parë</div></div><span class="pill">MULTIPLAYER</span></header>
 <section id="home" class="panel"><h1>Zgjidh lojën</h1><p class="muted">Një platformë për shumë lojëra. Për momentin mund të provosh Murlan me miqtë, në të njëjtën tavolinë online.</p><div class="notice">🃏 <strong>MURLAN</strong> · 1–4 lojtarë realë, vendet e tjera me AI</div><label>Emri yt</label><input id="name" class="field" maxlength="22" placeholder="Shkruaj pseudonimin"><div class="actions"><button onclick="createRoom()">Krijo tavolinë</button></div><p class="muted small">Ose fut kodin që të ka dërguar shoku:</p><input id="joinCode" class="field" maxlength="6" placeholder="Kodi 6-shifror" style="text-transform:uppercase"><button class="secondary" onclick="joinRoom()">Hyr në tavolinë</button><div id="homeError" class="status error"></div></section>
 <section id="lobby" class="panel hide"><h2>Tavolina e Murlanit</h2><p class="muted">Dërgoju shokëve kodin ose lidhjen. Çdo vend bosh do të luhet nga AI.</p><div class="bar"><div><div class="small muted">KODI I TAVOLINËS</div><div id="roomCode" class="roomcode"></div></div><button class="secondary" onclick="shareRoom()">Kopjo lidhjen</button></div><div id="lobbyPlayers" class="players" style="margin-top:20px"></div><div class="actions" style="margin-top:20px"><button id="startBtn" onclick="action('start')">Nis lojën</button></div><div id="lobbyStatus" class="status"></div></section>
-<section id="game" class="gamebox hide"><div class="bar" style="margin-top:16px"><div><strong>MURLAN ONLINE</strong><div id="round" class="small muted"></div></div><div class="bar"><span id="turnInfo" class="pill"></span><span id="codeGame" class="pill"></span></div></div><div class="board"><div id="players" class="table-seats"></div><div class="table-center"><div id="lastPlayedBy" aria-live="polite"></div><div class="label">Letra në tavolinë</div><div id="topCards" class="cards"></div><div id="combo" class="muted small"></div><div id="pile" class="small muted"></div></div></div><div id="gameNotice" class="notice hide"></div><div id="cutBox" class="cutbox hide"><h3>✂️ Prerja e pakos</h3><p id="cutLabel">Fituesi pret letrat</p><input id="cutRange" type="range" min="1" max="53" value="27" oninput="document.getElementById('cutNum').textContent=this.value"><div>Prerja: <b id="cutNum">27</b> letra</div><div id="dealVisual" class="small muted">🂠 54 letra · ndarje një nga një, në sens orar</div><button id="cutBtn" onclick="cutCards()">Prit dhe ndaj</button></div><div class="profileline"><span><span class="avatar">👤</span>Profili yt</span><span>🐾 Maskota · së shpejti</span></div><div class="bar"><strong>Letrat e tua <span id="handCount"></span></strong><span class="small muted">Prek letrat për t'i zgjedhur · 45 sekonda/turn</span></div><div id="hand" class="cards hand"></div><div class="actions"><button id="playBtn" onclick="play()">LUAJ</button><button class="secondary" onclick="gatherHand()">🃏 Bashko letrat</button><button id="passBtn" class="secondary" onclick="action('pass')">Pass</button><button id="returnBtn" class="secondary hide" onclick="returnCard()">Kthe letrën</button><button id="nextBtn" class="secondary hide" onclick="action('next')">Dora tjetër</button></div><div id="gameStatus" class="status"></div></section><div class="foot">Version testimi · tavolinat ruhen vetëm gjatë punës së serverit · emri i platformës do të vendoset më vonë</div></div>
+<section id="game" class="gamebox hide"><div class="bar" style="margin-top:16px"><div><strong>MURLAN ONLINE</strong><div id="round" class="small muted"></div></div><div class="bar"><span id="turnInfo" class="pill"></span><span id="codeGame" class="pill"></span></div></div><div class="board"><div id="players" class="table-seats"></div><div class="table-center"><div id="lastPlayedBy" aria-live="polite"></div><div class="label">Letra në tavolinë</div><div id="topCards" class="cards"></div><div id="combo" class="muted small"></div><div id="pile" class="small muted"></div></div></div><div id="gameNotice" class="notice hide"></div><div id="cutBox" class="cutbox hide"><h3>✂️ Prerja e pakos</h3><p id="cutLabel">Fituesi pret letrat</p><input id="cutRange" type="range" min="1" max="53" value="27" oninput="document.getElementById('cutNum').textContent=this.value"><div>Prerja: <b id="cutNum">27</b> letra</div><div id="dealVisual" class="small muted">🂠 54 letra · ndarje një nga një, në sens orar</div><button id="cutBtn" onclick="cutCards()">Prit dhe ndaj</button></div><div class="profileline"><span><span class="avatar">👤</span>Profili yt</span><span>🐾 Maskota · së shpejti</span></div><div class="bar"><strong>Letrat e tua <span id="handCount"></span></strong><span class="small muted">Prek letrat për t'i zgjedhur · 45 sekonda/turn</span></div><div class="hand-controls"><button id="playBtn" class="round-action" onclick="play()" title="Luaj letrat e zgjedhura">LUAJ</button><div id="hand" class="cards hand"></div><button id="passBtn" class="round-action pass-round" onclick="action('pass')" title="Kalo radhën">PASS</button></div><div class="actions secondary-actions"><button class="secondary" onclick="gatherHand()">🃏 Bashko letrat</button><button id="returnBtn" class="secondary hide" onclick="returnCard()">Kthe letrën</button><button id="nextBtn" class="secondary hide" onclick="action('next')">Dora tjetër</button></div><div id="gameStatus" class="status"></div></section><div class="foot">Version testimi · tavolinat ruhen vetëm gjatë punës së serverit · emri i platformës do të vendoset më vonë</div></div>
 <script>
 let previousTurnSeat=null,flashTimer=null;let auth=null,state=null,stream=null,selected=new Set(),order=[],slots=new Map(),geom=null,roundSeen=0,dealBusy=false,lastTopSignature=null,previousCounts=null,previousRound=null,lastPlayedName="",throwTimer=null;const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
