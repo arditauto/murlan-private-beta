@@ -178,6 +178,57 @@
  #game .table-center{inset:90px 25% 65px}
  #game .hand-controls #hand{height:96px;min-height:96px}
 }
+
+/* V8 — Poker room / compact card rail */
+#game .board{
+ width:min(100%,740px);height:344px;min-height:0;
+ border:9px solid #3a2419;border-radius:45px;
+ background:radial-gradient(ellipse at 48% 48%,#247c56 0%,#175c40 60%,#0c3d2d 100%);
+ box-shadow:0 0 0 2px #c49b50,0 0 0 5px #241810,0 12px 27px #0009,
+ inset 0 0 0 2px #e4c37a,inset 0 0 0 11px #103c2d,inset 0 0 45px #0007;
+ overflow:hidden;
+}
+#game .board:before{
+ content:'';position:absolute;inset:14px;border:1px solid #bca66a88;
+ border-radius:28px;pointer-events:none;z-index:0;
+}
+#game .board:after{
+ content:'MURLAN  •  PRIVATE TABLE';position:absolute;left:50%;top:52%;
+ transform:translate(-50%,-50%);font-family:Georgia,serif;font-size:25px;
+ font-weight:800;letter-spacing:5px;color:#e5ca7d12;white-space:nowrap;
+ pointer-events:none;z-index:0;
+}
+#game .table-seats .player{
+ background:linear-gradient(160deg,#123b2f,#0c2b22);border:1px solid #c7a567;
+ box-shadow:0 4px 13px #0009,inset 0 1px 0 #ffffff12;
+}
+#game .table-center{inset:88px 23% 61px;gap:5px;z-index:5}
+#lastPlayedBy{font-size:13px;min-height:21px;color:#ffe7a7;
+ background:#102e25c9;border-radius:16px;padding:3px 10px;
+ max-width:100%;white-space:normal;text-align:center}
+#game .table-center .label{font-size:10px;letter-spacing:1.5px}
+#game #topCards{gap:4px;min-height:66px}
+#game #topCards .card{min-width:39px;width:39px;height:63px}
+#game #combo,#game #pile{position:relative;z-index:7}
+#game .hand-controls{
+ width:min(100%,730px);margin:0 auto;
+ display:grid;grid-template-columns:60px minmax(0,1fr) 60px;gap:2px;align-items:center;
+}
+#game .hand-controls #hand{margin:6px 0 0;height:100px;min-height:100px}
+#game .round-action{width:59px;height:59px;font-size:11px;
+ border:2px solid #f6d78c;box-shadow:0 4px 11px #0008,inset 0 1px 4px #fff6}
+#game .round-action:hover:not(:disabled){filter:brightness(1.14);transform:scale(1.06)}
+#game .secondary-actions{margin-top:0}
+@media(max-width:600px){
+ #game .board{height:320px;border-width:6px;border-radius:30px}
+ #game .board:before{inset:10px;border-radius:21px}
+ #game .board:after{font-size:13px;letter-spacing:2px}
+ #game .table-center{inset:93px 27% 65px;gap:3px}
+ #lastPlayedBy{font-size:10px;min-height:17px;padding:2px 4px}
+ #game #topCards .card{min-width:29px;width:29px;height:51px}
+ #game .hand-controls{grid-template-columns:45px minmax(0,1fr) 45px;gap:1px}
+ #game .round-action{width:44px;height:44px;font-size:9px}
+}
 </style></head><body><div class="shell"><header><div><div class="brand">GAME HUB <span class="small muted">· beta</span></div><div class="small muted">Murlan · loja e parë</div></div><span class="pill">MULTIPLAYER</span></header>
 <section id="home" class="panel"><h1>Zgjidh lojën</h1><p class="muted">Një platformë për shumë lojëra. Për momentin mund të provosh Murlan me miqtë, në të njëjtën tavolinë online.</p><div class="notice">🃏 <strong>MURLAN</strong> · 1–4 lojtarë realë, vendet e tjera me AI</div><label>Emri yt</label><input id="name" class="field" maxlength="22" placeholder="Shkruaj pseudonimin"><div class="actions"><button onclick="createRoom()">Krijo tavolinë</button></div><p class="muted small">Ose fut kodin që të ka dërguar shoku:</p><input id="joinCode" class="field" maxlength="6" placeholder="Kodi 6-shifror" style="text-transform:uppercase"><button class="secondary" onclick="joinRoom()">Hyr në tavolinë</button><div id="homeError" class="status error"></div></section>
 <section id="lobby" class="panel hide"><h2>Tavolina e Murlanit</h2><p class="muted">Dërgoju shokëve kodin ose lidhjen. Çdo vend bosh do të luhet nga AI.</p><div class="bar"><div><div class="small muted">KODI I TAVOLINËS</div><div id="roomCode" class="roomcode"></div></div><button class="secondary" onclick="shareRoom()">Kopjo lidhjen</button></div><div id="lobbyPlayers" class="players" style="margin-top:20px"></div><div class="actions" style="margin-top:20px"><button id="startBtn" onclick="action('start')">Nis lojën</button></div><div id="lobbyStatus" class="status"></div></section>
@@ -243,6 +294,6 @@ if(newTop){
 }
 previousCounts=[...g.counts];previousRound=g.round;
 $('lastPlayedBy').textContent=g.topcards.length?(lastPlayedName?'🃏 '+lastPlayedName+' hodhi letrat':'🃏 Letrat e fundit në tavolinë'):'';
-const changed=lastTopSignature!==null&&lastTopSignature!==topSignature&&g.topcards.length>0;lastTopSignature=topSignature;const topArea=$('topCards');topArea.innerHTML=g.topcards.length?g.topcards.map((c,i)=>cardHTML(c).replace('class="card ','style="--card-index:'+i+'" class="card ')).join(''):'<span class="muted">Tavolina është e lirë</span>';if(changed){const origins=[['0px','115px'],['-210px','0px'],['0px','-135px'],['210px','0px']];const sourceSeat=lastPlayedName?ps.findIndex(p=>p.name===lastPlayedName):-1;const origin=origins[sourceSeat>=0?(sourceSeat-state.seat+4)%4:2];topArea.style.setProperty('--throw-x',origin[0]);topArea.style.setProperty('--throw-y',origin[1]);const center=topArea.parentElement;center.classList.remove('throw-flash');void center.offsetWidth;center.classList.add('throw-flash');clearTimeout(flashTimer);flashTimer=setTimeout(()=>center.classList.remove('throw-flash'),950);topArea.classList.remove('throwing');void topArea.offsetWidth;topArea.classList.add('throwing');clearTimeout(throwTimer);throwTimer=setTimeout(()=>topArea.classList.remove('throwing'),1100)}$('pile').textContent='Letra të hedhura: '+g.pile.length;const names={single:'Një letër',pair:'Çift',triple:'Tre letra',bomb:'Bombë',straight:'Shkallë'};$('combo').textContent=g.top?names[g.top.type]+(g.top.type==='straight'?' · '+g.top.n+' letra':''):'';renderHand();const mine=g.turn===state.seat,exchange=g.exchange,done=g.finished.length===4;$('playBtn').disabled=!mine||!!cut||!!exchange||done||g.champion||!g.hand.length;$('passBtn').disabled=!mine||!g.top||!!cut||!!exchange||done||g.champion;$('returnBtn').classList.toggle('hide',!(exchange&&exchange.winner===state.seat));$('nextBtn').classList.toggle('hide',!(done&&!g.champion&&state.seat===0));const msg=$('gameNotice');let t='';if(cut)t='Pritet prerja e letrave nga '+ps[cut.cutter].name;else if(g.champion){const top=Math.max(...g.scores);t='🏆 Kampionati përfundoi! Fituesi: '+ps[g.scores.indexOf(top)].name}else if(done)t='Dora përfundoi! Renditja: '+g.finished.map((i,j)=>(j+1)+'. '+ps[i].name).join(' · ');else if(exchange)t='Shkëmbim: '+ps[exchange.loser].name+' i dha letrën më të lartë '+ps[exchange.winner].name+'. Fituesi duhet të kthejë një letër të lejuar.';else if(g.required)t='Lojtari me 3♠ hap dorën e parë dhe duhet ta përdorë atë letër.';else if(mine)t='Është radha jote!';msg.textContent=t;msg.classList.toggle('hide',!t)}
+const changed=lastTopSignature!==null&&lastTopSignature!==topSignature&&g.topcards.length>0;lastTopSignature=topSignature;const topArea=$('topCards');topArea.innerHTML=g.topcards.length?(g.top?.type==='straight'?sortedCards(g.topcards):g.topcards).map((c,i)=>cardHTML(c).replace('class="card ','style="--card-index:'+i+'" class="card ')).join(''):'<span class="muted">Tavolina është e lirë</span>';if(changed){const origins=[['0px','115px'],['-210px','0px'],['0px','-135px'],['210px','0px']];const sourceSeat=lastPlayedName?ps.findIndex(p=>p.name===lastPlayedName):-1;const origin=origins[sourceSeat>=0?(sourceSeat-state.seat+4)%4:2];topArea.style.setProperty('--throw-x',origin[0]);topArea.style.setProperty('--throw-y',origin[1]);const center=topArea.parentElement;center.classList.remove('throw-flash');void center.offsetWidth;center.classList.add('throw-flash');clearTimeout(flashTimer);flashTimer=setTimeout(()=>center.classList.remove('throw-flash'),950);topArea.classList.remove('throwing');void topArea.offsetWidth;topArea.classList.add('throwing');clearTimeout(throwTimer);throwTimer=setTimeout(()=>topArea.classList.remove('throwing'),1100)}$('pile').textContent='Letra të hedhura: '+g.pile.length;const names={single:'Një letër',pair:'Çift',triple:'Tre letra',bomb:'Bombë',straight:'Shkallë'};$('combo').textContent=g.top?names[g.top.type]+(g.top.type==='straight'?' · '+g.top.n+' letra':''):'';renderHand();const mine=g.turn===state.seat,exchange=g.exchange,done=g.finished.length===4;$('playBtn').disabled=!mine||!!cut||!!exchange||done||g.champion||!g.hand.length;$('passBtn').disabled=!mine||!g.top||!!cut||!!exchange||done||g.champion;$('returnBtn').classList.toggle('hide',!(exchange&&exchange.winner===state.seat));$('nextBtn').classList.toggle('hide',!(done&&!g.champion&&state.seat===0));const msg=$('gameNotice');let t='';if(cut)t='Pritet prerja e letrave nga '+ps[cut.cutter].name;else if(g.champion){const top=Math.max(...g.scores);t='🏆 Kampionati përfundoi! Fituesi: '+ps[g.scores.indexOf(top)].name}else if(done)t='Dora përfundoi! Renditja: '+g.finished.map((i,j)=>(j+1)+'. '+ps[i].name).join(' · ');else if(exchange)t='Shkëmbim: '+ps[exchange.loser].name+' i dha letrën më të lartë '+ps[exchange.winner].name+'. Fituesi duhet të kthejë një letër të lejuar.';else if(g.required)t='Lojtari me 3♠ hap dorën e parë dhe duhet ta përdorë atë letër.';else if(mine)t='Është radha jote!';msg.textContent=t;msg.classList.toggle('hide',!t)}
 setInterval(()=>{if(state?.game?.turnEndsAt&&!state.game.cut){const g=state.game;$('turnInfo').textContent='Radha: '+state.players[g.turn].name+' · '+Math.max(0,Math.ceil((g.turnEndsAt-Date.now())/1000))+'s'}},500);window.addEventListener('resize',()=>{if(state?.game)handLayout()});$('name').value=localStorage.getItem('murlan_name')||'';const params=new URLSearchParams(location.search);if(params.has('room'))$('joinCode').value=params.get('room');try{const saved=JSON.parse(sessionStorage.getItem('murlan_auth')||'null');if(saved?.code&&saved?.token)connect(saved)}catch(e){}
 </script></body></html>
